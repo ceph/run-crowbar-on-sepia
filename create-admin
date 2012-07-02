@@ -1,0 +1,174 @@
+#!/usr/bin/python
+import argparse
+import subprocess
+import sys
+
+from lxml import etree
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Create Crowbar admin node',
+        )
+    parser.add_argument(
+        'uri',
+        metavar='URI',
+        help='libvirt URI to connect to',
+        )
+    parser.add_argument(
+        'network',
+        metavar='NETWORK',
+        help='network to use as isolated network',
+        )
+    parser.add_argument(
+        'iso',
+        metavar='ISO',
+        help='name of the ISO image to use (must be uploaded already)',
+        )
+    parser.add_argument(
+        'name',
+        metavar='NAME',
+        help='unique name to give this crowbar cluster',
+        )
+    args = parser.parse_args()
+    return args
+
+
+def template(args):
+    tree = etree.fromstring("""
+<domain type='kvm'>
+  <name>XYZZY</name>
+  <memory>2097152</memory>
+  <os>
+    <type arch='x86_64' machine='pc-0.12'>hvm</type>
+    <boot dev='hd'/>
+    <boot dev='cdrom'/>
+    <bootmenu enable='yes'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='XYZZY'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <shareable/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='XYZZY'/>
+      <target dev='sda' bus='sata'/>
+    </disk>
+    <controller type='ide' index='0'>
+    </controller>
+    <controller type='scsi' index='0'>
+    </controller>
+    <interface type='network'>
+      <source network='XYZZY'/>
+      <model type='e1000'/>
+    </interface>
+    <interface type='network'>
+      <source network='front'/>
+      <model type='e1000'/>
+    </interface>
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <input type='mouse' bus='ps2'/>
+    <graphics type='vnc' port='-1' autoport='yes'/>
+  </devices>
+</domain>
+""")
+    (name_elem,) = tree.xpath('/domain/name')
+    name_elem.text = 'crow-{name}-admin'.format(name=args.name)
+
+    assert args.iso.endswith('.iso')
+    assert '/' not in args.iso
+    # evil hardcoded path
+    iso_path = '/var/lib/libvirt/images/{name}'.format(
+        name=args.iso,
+        )
+    (iso_elem,) = tree.xpath(
+        '/domain/devices/disk[@device="cdrom"]/source',
+        )
+    iso_elem.set('file', iso_path)
+
+    assert '/' not in args.name
+    # evil hardcoded path
+    hdd_path = '/var/lib/libvirt/images/crow-{name}-admin.img'.format(
+        name=args.name,
+        )
+    (hdd_elem,) = tree.xpath(
+        '/domain/devices/disk[@device="disk"]/source',
+        )
+    hdd_elem.set('file', hdd_path)
+
+    assert args.network.startswith('isolated')
+    (network_elem,) = tree.xpath(
+        '/domain/devices/interface[@type="network"]'
+        + '/source[@network="XYZZY"]',
+        )
+    network_elem.set('network', args.network)
+    s = etree.tostring(tree)
+    assert 'XYZZY' not in s
+    return s
+
+
+def main():
+    args = parse_args()
+
+    subprocess.check_call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'vol-create-as',
+            '--pool=default',
+            '--capacity=20G',
+            '--format=raw',
+            '--name=crow-{name}-admin.img'.format(
+                name=args.name,
+                ),
+            ],
+        )
+
+    admin_xml = template(args)
+    define_args = [
+        'virsh',
+        '--connect={uri}'.format(uri=args.uri),
+        'define',
+        '/dev/stdin',
+        ]
+    p = subprocess.Popen(
+        args=define_args,
+        stdin=subprocess.PIPE,
+        )
+    p.communicate(input=admin_xml)
+    ret = p.wait()
+    if ret != 0:
+        raise subprocess.CalledProcessError(ret, define_args)
+
+    subprocess.check_call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'start',
+            '--domain=crow-{name}-admin'.format(
+                name=args.name,
+                ),
+            ],
+        )
+
+
+if __name__ == '__main__':
+    sys.exit(main())

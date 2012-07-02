@@ -1,0 +1,86 @@
+#!/usr/bin/python
+import argparse
+import subprocess
+import sys
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Create Crowbar deploy node',
+        )
+    parser.add_argument(
+        'uri',
+        metavar='URI',
+        help='libvirt URI to connect to',
+        )
+    parser.add_argument(
+        'name',
+        metavar='NAME',
+        help='unique name of this crowbar cluster',
+        )
+    args = parser.parse_args()
+    return args
+
+
+def destroy(args, name):
+    ret = subprocess.call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'destroy',
+            '--domain={name}'.format(
+                name=name,
+                ),
+            ],
+        )
+    assert ret in [0, 1]
+
+    ret = subprocess.call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'undefine',
+            '--domain={name}'.format(
+                name=name,
+                ),
+            ],
+        )
+    assert ret in [0, 1]
+
+    ret = subprocess.call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'vol-delete',
+            '--pool=default',
+            '--vol={name}.img'.format(
+                name=name,
+                ),
+            ],
+        )
+    assert ret in [0, 1]
+
+
+
+def main():
+    args = parse_args()
+
+    destroy(
+        args=args,
+        name='crow-{name}-admin'.format(
+            name=args.name,
+            ),
+        )
+
+    for i in xrange(1, 10):
+        destroy(
+            args=args,
+            name='crow-{name}-node-{number}'.format(
+                name=args.name,
+                number=i,
+                ),
+            )
+
+
+if __name__ == '__main__':
+    sys.exit(main())
