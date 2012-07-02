@@ -24,7 +24,7 @@ Add aliases to avoid typing so much::
 	    'vercoi05=qemu+ssh://ubuntu@vercoi05.front.sepia.ceph.com/system?no_tty',
 	    'vercoi06=qemu+ssh://ubuntu@vercoi06.front.sepia.ceph.com/system?no_tty',
 	    'vercoi07=qemu+ssh://ubuntu@vercoi07.front.sepia.ceph.com/system?no_tty',
-	    'vercoi08=qemu+ssh://ubuntu@vercoi07.front.sepia.ceph.com/system?no_tty',
+	    'vercoi08=qemu+ssh://ubuntu@vercoi08.front.sepia.ceph.com/system?no_tty',
 	    ]
     EOF
 
