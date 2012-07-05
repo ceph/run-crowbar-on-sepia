@@ -76,12 +76,24 @@ again, replace ``NAME`` with what you chose above, and run::
 
 TODO VNC guide for non-linux
 
+Run the following and eth1 will be automatically available after each
+reboot::
+
+    sudo tee /etc/init/inktank-dhcp.conf <<-'EOF'
+	description "Bring up 'front' network on eth1."
+	start on startup
+	task
+	script
+	  exec /sbin/dhclient eth1
+	end script
+    EOF
+
 To use the Crowbar web UI, run on the console::
 
-    sudo dhclient eth1
     ip a show dev eth1
 
 And, using the IP address shown, open browser to http://IP:3000/
+
 
 -----
 
