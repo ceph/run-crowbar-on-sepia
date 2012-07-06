@@ -59,7 +59,7 @@ def template(args):
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
       <source file='XYZZY'/>
-      <target dev='vda' bus='virtio'/>
+      <target dev='sda' bus='sata'/>
     </disk>
     <interface type='network'>
       <source network='XYZZY'/>
