@@ -39,7 +39,7 @@ def template(args):
     tree = etree.fromstring("""
 <domain type='kvm'>
   <name>XYZZY</name>
-  <memory>524288</memory>
+  <memory>1048576</memory>
   <os>
     <type arch='x86_64' machine='pc-0.12'>hvm</type>
     <boot dev='network'/>
