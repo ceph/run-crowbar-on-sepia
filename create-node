@@ -57,9 +57,14 @@ def template(args):
   <devices>
     <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='qcow2'/>
       <source file='XYZZY'/>
       <target dev='sda' bus='sata'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='XYZZY'/>
+      <target dev='sdb' bus='sata'/>
     </disk>
     <interface type='network'>
       <source network='XYZZY'/>
@@ -89,7 +94,17 @@ def template(args):
         number=args.number,
         )
     (hdd_elem,) = tree.xpath(
-        '/domain/devices/disk[@device="disk"]/source',
+        '/domain/devices/disk[@device="disk"][1]/source',
+        )
+    hdd_elem.set('file', hdd_path)
+
+    # evil hardcoded path2
+    hdd_path = '/var/lib/libvirt/images/crow-{name}-node-{number}-2.img'.format(
+        name=args.name,
+        number=args.number,
+        )
+    (hdd_elem,) = tree.xpath(
+        '/domain/devices/disk[@device="disk"][2]/source',
         )
     hdd_elem.set('file', hdd_path)
 
@@ -117,7 +132,7 @@ def main():
             'vol-create-as',
             '--pool=default',
             '--capacity=10G',
-            '--format=raw',
+            '--format=qcow2',
             '--name=crow-{name}-node-{number}.img'.format(
                 name=args.name,
                 number=args.number,
@@ -126,6 +141,24 @@ def main():
         )
 
     node_xml = template(args)
+
+    subprocess.check_call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'vol-create-as',
+            '--pool=default',
+            '--capacity=50G',
+            '--format=qcow2',
+            '--name=crow-{name}-node-{number}-2.img'.format(
+                name=args.name,
+                number=args.number,
+                ),
+            ],
+        )
+
+    node_xml = template(args)
+
     define_args = [
         'virsh',
         '--connect={uri}'.format(uri=args.uri),

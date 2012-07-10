@@ -60,6 +60,18 @@ def destroy(args, name):
         )
     assert ret in [0, 1]
 
+    ret = subprocess.call(
+        args=[
+            'virsh',
+            '--connect={uri}'.format(uri=args.uri),
+            'vol-delete',
+            '--pool=default',
+            '--vol={name}-2.img'.format(
+                name=name,
+                ),
+            ],
+        )
+    assert ret in [0, 1]
 
 
 def main():
