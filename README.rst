@@ -15,7 +15,7 @@ Install necessary packages::
 Add aliases to avoid typing so much::
 
     install -d -m0755 ~/.libvirt
-    cat <<-'EOF'
+    cat >~/.libvirt/libvirt.conf <<-'EOF'
 	uri_aliases = [
 	    'vercoi01=qemu+ssh://ubuntu@vercoi01.front.sepia.ceph.com/system?no_tty',
 	    'vercoi02=qemu+ssh://ubuntu@vercoi02.front.sepia.ceph.com/system?no_tty',
