@@ -140,8 +140,6 @@ def main():
             ],
         )
 
-    node_xml = template(args)
-
     subprocess.check_call(
         args=[
             'virsh',
