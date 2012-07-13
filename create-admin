@@ -170,5 +170,13 @@ def main():
         )
 
 
+    print 'Your Crowbar server is now running, and once'
+    print 'you start dhclient it will get the DNS name'
+    print
+    print '  crow-{name}-admin.front.sepia.ceph.com'.format(
+                name=args.name,
+                )
+    print
+
 if __name__ == '__main__':
     sys.exit(main())
