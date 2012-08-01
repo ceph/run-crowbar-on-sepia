@@ -56,7 +56,7 @@ def template(args):
   <devices>
     <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
+      <driver name='qemu' type='raw' cache='writeback'/>
       <source file='XYZZY'/>
       <target dev='hdc' bus='ide'/>
       <readonly/>
