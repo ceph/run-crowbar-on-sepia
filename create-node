@@ -57,12 +57,12 @@ def template(args):
   <devices>
     <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='qcow2'/>
+      <driver name='qemu' type='qcow2' cache='writeback'/>
       <source file='XYZZY'/>
       <target dev='sda' bus='sata'/>
     </disk>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='qcow2'/>
+      <driver name='qemu' type='qcow2' cache='writeback'/>
       <source file='XYZZY'/>
       <target dev='sdb' bus='sata'/>
     </disk>
