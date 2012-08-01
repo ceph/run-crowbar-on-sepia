@@ -50,6 +50,10 @@ def template(args):
     <apic/>
     <pae/>
   </features>
+  <cpu match='exact'>
+    <model>core2duo</model>
+    <feature policy='require' name='vmx'/>
+  </cpu>
   <clock offset='utc'/>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
