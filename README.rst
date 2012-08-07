@@ -79,6 +79,15 @@ TODO VNC guide for non-linux
 Run the following and eth1 will be automatically available after each
 reboot::
 
+    sudo tee /etc/dhcp/dhclient-enter-hooks.d/inktank-kludge-resolvconf <<'EOF'
+    # prevent dhclient from updating /etc/resolv.conf
+    #
+    # Crowbar wants to use Chef templates to manage this file
+    # (and control DNS resolution for the node names); without
+    # this, the two will fight about the contents
+    make_resolv_conf() { :; }
+    EOF
+
     sudo tee /etc/init/inktank-dhcp.conf <<-'EOF'
 	description "Bring up 'front' network on eth1."
 	start on startup
