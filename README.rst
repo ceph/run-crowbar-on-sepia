@@ -97,12 +97,9 @@ reboot::
 	end script
     EOF
 
-To use the Crowbar web UI, run on the console::
-
-    ip a show dev eth1
-
-And, using the IP address shown, open browser to http://IP:3000/
-
+Once you have the DHCP lease, you can see the Crowbar admin interface
+at http://crow-NAME-admin.front.sepia.ceph.com:3000/ (once again,
+replace ``NAME`` with what you chose above).
 
 -----
 
