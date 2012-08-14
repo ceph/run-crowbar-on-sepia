@@ -67,8 +67,10 @@ To create the admin node::
     ./create-admin URI NETWORK ISO NAME
 
 Now connect to the console via VNC and finish the
-installation. ``virt-manager`` is a nice tool for Linux users. Once
-again, replace ``NAME`` with what you chose above, and run::
+installation. ``virt-manager`` is a nice tool for Linux users.
+
+Log in on the console as user ``crowbar`` password ``crowbar``, and
+replacing ``NAME`` with what you chose above run::
 
     cd /tftpboot/ubuntu_dvd/extra
     sudo ./install NAME.crow.sepia.ceph.com
