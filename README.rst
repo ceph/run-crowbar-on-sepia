@@ -93,9 +93,8 @@ reboot::
     sudo tee /etc/init/inktank-dhcp.conf <<-'EOF'
 	description "Bring up 'front' network on eth1."
 	start on startup
-	task
 	script
-	  exec /sbin/dhclient eth1
+	  exec /sbin/dhclient -d eth1
 	end script
     EOF
 
