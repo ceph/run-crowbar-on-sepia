@@ -98,6 +98,10 @@ reboot::
 	end script
     EOF
 
+To get an IP address without a reboot, run::
+
+    sudo start inktank-dhcp
+
 Once you have the DHCP lease, you can see the Crowbar admin interface
 at http://crow-NAME-admin.front.sepia.ceph.com:3000/ (once again,
 replace ``NAME`` with what you chose above).
