@@ -116,6 +116,34 @@ Once the server is running, add nodes by running::
 
 -----
 
+You can use web interfaces provided by Crowbar nodes with a SOCKS5
+tunnel to the Crowbar server. First, establish the tunnel::
+
+    ./socks NAME
+
+You can background ``socks``, or just leave it running in a
+terminal. Remember to stop it when you're done, by bringing it to
+foreground and pressing ``control-C``.
+
+And then run a specially configured browser that uses that tunnel::
+
+    ./remotely-firefox
+
+The browser is able to see the Crowbar-managed DNS names, so you don't
+need to use IP addresses.
+
+You can also pass URLs to ``remotely-firefox`` on the command line.
+for example (replace X's)::
+
+    ./remotely-firefox http://d52-54-00-XX-XX-XX.crow.sepia.ceph.com/
+
+By default, these commands use port 2000 to communicate. If you need
+to browse multiple Crowbar clusters at once, you'll need to manage
+ports manually. Use ``-p 2001`` and so on; see the help messages of
+the commands for more.
+
+-----
+
 And finally, once you are done testing, remove your vms::
 
     ./destroy URI NAME

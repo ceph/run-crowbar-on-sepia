@@ -1,0 +1,49 @@
+#!/usr/bin/python
+import argparse
+import os
+import sys
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Run a SOCKS connection to crowbar server',
+        )
+    parser.add_argument(
+        '-p', '--port',
+        metavar='PORT',
+        help='port to listen on (default %(default)d)',
+        )
+    parser.add_argument(
+        'name',
+        metavar='NAME',
+        help='unique name of this crowbar cluster',
+        )
+    parser.set_defaults(
+        port=2000,
+        )
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+
+    os.execvp(
+        file='ssh',
+        args=[
+            'ssh',
+            '-v',
+            '-D{port}'.format(
+                port=args.port,
+                ),
+            '-N',
+            '--',
+            'crowbar@crow-{name}-admin.front.sepia.ceph.com'.format(
+                name=args.name,
+                ),
+            ],
+        )
+
+
+if __name__ == '__main__':
+    sys.exit(main())

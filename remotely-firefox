@@ -1,0 +1,85 @@
+#!/usr/bin/python
+import argparse
+import os
+import subprocess
+import sys
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Run Firefox using a SOCKS proxy',
+        )
+    parser.add_argument(
+        '-p', '--port',
+        metavar='PORT',
+        help='port where SOCKS is (default %(default)d)',
+        )
+    parser.add_argument(
+        'urls',
+        metavar='URL',
+        nargs='*',
+        )
+    parser.set_defaults(
+        port=2000,
+        )
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+
+    # make sure our special profile doesn't become the default one
+    # just by virtue of being the only profile
+    subprocess.check_call(
+        args=[
+            'firefox',
+            'firefox',
+            '-CreateProfile', 'default',
+            ],
+        )
+
+    MOZILLA_PREF_DIR = os.path.expanduser('~/.mozilla/firefox')
+    pref_path = os.path.join(MOZILLA_PREF_DIR, 'crowbar-on-sepia')
+    subprocess.check_call(
+        args=[
+            'firefox',
+            # yes the name and the path are in the same command line
+            # argument.. hooray for Mozilla
+            '-CreateProfile', 'crowbar-on-sepia {path}'.format(
+                path=pref_path,
+                ),
+            ],
+        )
+
+    # adjust proxy edit settings
+    with file(os.path.join(pref_path, 'prefs.js'), 'a') as f:
+        f.write("""\
+user_pref("network.proxy.socks", "127.0.0.1");
+user_pref("network.proxy.socks_port", {port});
+user_pref("network.proxy.socks_remote_dns", true);
+user_pref("network.proxy.type", 1);
+""".format(
+                port=args.port,
+                ))
+
+    firefox_args = [
+        'firefox',
+        '-P', 'crowbar-on-sepia',
+        '-no-remote',
+        '-new-instance',
+        ]
+    for url in args.urls:
+        firefox_args.extend([
+                '--new-tab',
+                url,
+                ])
+
+    os.execvp(
+        file='firefox',
+        args=firefox_args,
+        )
+
+
+if __name__ == '__main__':
+    sys.exit(main())
