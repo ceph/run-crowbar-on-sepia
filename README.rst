@@ -108,11 +108,13 @@ replace ``NAME`` with what you chose above).
 
 -----
 
-Once the server is running, add nodes by running::
+Once the server is running, you can at any time add a node by
+running::
 
-    ./create-node URI NETWORK NAME 1
-    ./create-node URI NETWORK NAME 2
-    # repeat with increasing numbers, if you need more
+    ./create-node URI NETWORK NAME NUMBER
+
+where ``NUMBER`` is 1, 2, 3 etc; each node started needs a unique node
+number.
 
 -----
 
