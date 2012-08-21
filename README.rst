@@ -124,8 +124,8 @@ tunnel to the Crowbar server. First, establish the tunnel::
     ./socks NAME
 
 You can background ``socks``, or just leave it running in a
-terminal. Remember to stop it when you're done, by bringing it to
-foreground and pressing ``control-C``.
+terminal. To stop it when you no longer need it, bring it to
+foreground and press ``control-C``.
 
 And then run a specially configured browser that uses that tunnel::
 
